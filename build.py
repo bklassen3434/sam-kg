@@ -1,6 +1,6 @@
 """Build site/data.js from the Sam iMessage thread.
 
-Only aggregated stats plus the hand-picked quotes/hashtags below end up in the
+Only aggregated stats plus the hand-picked hashtags below end up in the
 published site. The raw export (data/raw.json) stays local (gitignored).
 
     python3 build.py          # re-export from Messages + rebuild data.js
@@ -19,24 +19,6 @@ RAW = ROOT / "data" / "raw.json"
 OUT = ROOT / "data.js"
 
 # --- Hand-curated bits (edit freely; this is what's public) -----------------
-QUOTES = [
-    "ur such a binx bams",
-    "beech!!!! have a nice call with cislak!!!",
-    "#soulmating with my binx!!!!!",
-    "the name ella is objectively so binx!",
-    "whats on ur agenda today cheechuuu",
-    "our kids r so binxy",
-    "u cheech muffin",
-    "ur such a freaking trinxie i love u so much 😘",
-    "omg cuddles ur so binx 😂😂😂😂😂😂😂😂😂😂😂",
-    "i have a huge update from this weekend can't believe i forgot to tell u… i used my ironing board",
-    "i love you, you are the man of my dreams, keep going 💪",
-    "beech ur dead to me",
-    "i'm coming for you, your cheechoo, your beechoo, and ur meemoo 😘",
-    "remember when u said u want to work on ur physical comedy and im like jams u have more physical comedy than anyone i know 😂",
-    "what r u up to tonight beechito poopsie? any roboting? 😘",
-    "ur such a sweet pea munchkin 😘",
-]
 HASHTAGS = [
     "#soulmates", "#winning", "#cricket", "#hadassah", "#hadassah is my religion",
     "#hadassah is also iconic", "#friendship", "#besties", "#cuddle bunnies",
@@ -226,7 +208,6 @@ def build(raw):
         "weekday": weekday,
         "emoji": emoji,
         "urSuchA": such.most_common(14),
-        "quotes": QUOTES,
         "hashtags": HASHTAGS,
     }
 
