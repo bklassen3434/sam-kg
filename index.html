@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Bams &amp; Binx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.7/build/d3.layout.cloud.min.js"></script>
+<script src="data.js"></script>
+<style>
+:root {
+  --bg: #fff8f3;
+  --bg2: #fff0e8;
+  --card: #ffffff;
+  --ink: #2a1a22;
+  --muted: #8a7480;
+  --line: #f0dfe3;
+  --sam: #ff4f8b;
+  --sam-soft: #ffe0ea;
+  --ben: #0a84ff;
+  --ben-soft: #dcecff;
+  --gray-bubble: #e9e9eb;
+  --gray-ink: #111;
+  --shadow: 0 1px 2px rgba(80,20,40,.04), 0 8px 30px rgba(80,20,40,.07);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #150d14;
+    --bg2: #1d121b;
+    --card: #231621;
+    --ink: #fbeef3;
+    --muted: #b095a4;
+    --line: #3a2635;
+    --sam: #ff6b9d;
+    --sam-soft: #4a1d30;
+    --ben: #3b9bff;
+    --ben-soft: #173150;
+    --gray-bubble: #3a3a3c;
+    --gray-ink: #fff;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 30px rgba(0,0,0,.35);
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
+}
+.sam { color: var(--sam); } .ben { color: var(--ben); }
+h1, h2, h3, .serif { font-family: Fraunces, Georgia, serif; }
+h2 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.05; margin: 0 0 .4rem; font-weight: 900; letter-spacing: -.02em; }
+.kicker { text-transform: uppercase; letter-spacing: .16em; font-size: .75rem; font-weight: 700; color: var(--muted); margin-bottom: .6rem; }
+.lede { color: var(--muted); max-width: 40rem; margin: 0 0 2.2rem; font-size: 1.05rem; }
+section { padding: 5.5rem 16px; }
+.wrap { max-width: 1080px; margin: 0 auto; }
+.alt { background: var(--bg2); }
+
+/* Hero */
+.hero { min-height: 100svh; display: grid; place-items: center; position: relative; overflow: hidden; padding: 16px; text-align: center; }
+.hero h1 { font-size: clamp(5rem, 22vw, 15rem); line-height: .85; margin: 0; font-weight: 900; letter-spacing: -.05em; position: relative; z-index: 2; }
+.hero h1 em { font-style: italic; font-weight: 400; color: var(--sam); }
+.hero p { position: relative; z-index: 2; font-size: clamp(1rem, 2.4vw, 1.3rem); color: var(--muted); margin: 1.4rem 0 0; }
+.hero p b { color: var(--ink); }
+.floaters { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.floater { position: absolute; padding: .5rem .9rem; border-radius: 1.2rem; font-size: .9rem; white-space: nowrap; opacity: 0; animation: float 14s linear infinite; }
+.floater.s { background: var(--gray-bubble); color: var(--gray-ink); border-bottom-left-radius: .3rem; }
+.floater.b { background: var(--ben); color: #fff; border-bottom-right-radius: .3rem; }
+@keyframes float {
+  0% { transform: translateY(40px); opacity: 0; }
+  10%, 80% { opacity: .75; }
+  100% { transform: translateY(-160px); opacity: 0; }
+}
+.scroll-cue { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); z-index: 2; color: var(--muted); font-size: .8rem; letter-spacing: .15em; text-transform: uppercase; animation: bob 2s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translate(-50%, 6px); } }
+
+/* Big stat cards */
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.card { background: var(--card); border-radius: 22px; padding: 1.5rem; box-shadow: var(--shadow); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.card .big { font-family: Fraunces, serif; font-size: 3.6rem; font-weight: 900; line-height: 1; letter-spacing: -.03em; }
+.card .label { font-weight: 600; margin-top: .4rem; }
+.card .sub { color: var(--muted); font-size: .92rem; margin-top: .3rem; }
+.card.wide { grid-column: span 2; }
+@media (max-width: 560px) { .card.wide { grid-column: auto; } }
+.card.pink { background: var(--sam); color: #fff; border: 0; }
+.card.pink .sub { color: rgba(255,255,255,.85); }
+
+/* Sam-isms ticker */
+.such { font-family: Fraunces, serif; font-size: clamp(2rem, 6vw, 3.6rem); font-weight: 700; line-height: 1.1; }
+.such .slot { display: inline-block; color: var(--sam); font-style: italic; min-width: 4ch; transition: opacity .25s, transform .25s; }
+.such .slot.out { opacity: 0; transform: translateY(-.3em); }
+
+/* Face-off bars */
+.faceoff { display: grid; gap: 1.1rem; }
+.fo-row { display: grid; grid-template-columns: 1fr minmax(120px, 190px) 1fr; align-items: center; gap: 12px; }
+.fo-label { text-align: center; font-weight: 600; font-size: .92rem; }
+.fo-label small { display: block; color: var(--muted); font-weight: 400; font-size: .78rem; }
+.fo-bar { height: 34px; display: flex; align-items: center; }
+.fo-bar.left { justify-content: flex-end; }
+.fo-bar span { height: 100%; border-radius: 999px; display: flex; align-items: center; padding: 0 .75rem; color: #fff; font-weight: 700; font-size: .9rem; min-width: 3rem; width: 0; transition: width 1.1s cubic-bezier(.2,.8,.2,1); white-space: nowrap; }
+.fo-bar.left span { background: var(--sam); justify-content: flex-start; }
+.fo-bar.right span { background: var(--ben); justify-content: flex-end; }
+.fo-head { display: grid; grid-template-columns: 1fr minmax(120px, 190px) 1fr; gap: 12px; font-family: Fraunces, serif; font-size: 1.6rem; font-weight: 900; margin-bottom: .6rem; }
+.fo-head div:first-child { text-align: right; }
+@media (max-width: 560px) {
+  .fo-row, .fo-head { grid-template-columns: 1fr 1fr; }
+  .fo-label { grid-column: 1 / -1; order: -1; }
+  .fo-head div:nth-child(2) { display: none; }
+}
+
+/* Pet name pack */
+#pets svg, #clouds svg { width: 100%; height: auto; display: block; }
+.legend { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: .9rem; color: var(--muted); margin-bottom: 1rem; }
+.legend i { display: inline-block; width: .8rem; height: .8rem; border-radius: 50%; margin-right: .35rem; vertical-align: -1px; }
+.tip { position: fixed; pointer-events: none; background: var(--ink); color: var(--bg); padding: .45rem .7rem; border-radius: 10px; font-size: .85rem; opacity: 0; transition: opacity .15s; z-index: 50; }
+
+/* Clouds */
+.clouds { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 760px) { .clouds { grid-template-columns: 1fr; } }
+.clouds h3 { margin: 0 0 .5rem; font-size: 1.6rem; }
+
+/* Hashtags */
+.tags { display: flex; flex-wrap: wrap; gap: .55rem; }
+.tag { background: var(--card); border: 1px solid var(--line); padding: .45rem .9rem; border-radius: 999px; font-weight: 600; font-size: .95rem; box-shadow: var(--shadow); transition: transform .2s; cursor: default; }
+.tag:hover { transform: rotate(-3deg) scale(1.06); background: var(--sam); color: #fff; border-color: var(--sam); }
+
+/* Quotes as bubbles */
+.thread { display: flex; flex-direction: column; gap: .5rem; max-width: 560px; margin: 0 auto; }
+.bubble { align-self: flex-start; max-width: 85%; background: var(--gray-bubble); color: var(--gray-ink); padding: .6rem 1rem; border-radius: 1.25rem; border-bottom-left-radius: .35rem; font-size: 1.02rem; opacity: 0; transform: translateY(12px) scale(.97); transition: opacity .4s, transform .4s; }
+.bubble.in { opacity: 1; transform: none; }
+.bubble.tb { position: relative; margin-top: .9rem; }
+.bubble.tb::after { content: attr(data-tb); position: absolute; top: -.95rem; right: -.4rem; background: var(--ben); color: #fff; border-radius: 999px; padding: .1rem .4rem; font-size: .8rem; border: 2px solid var(--bg); }
+.sender { font-size: .75rem; color: var(--muted); margin: 0 0 -.2rem .8rem; }
+
+/* Charts */
+.chart-card { background: var(--card); border-radius: 22px; padding: 1.4rem 1.2rem 1rem; box-shadow: var(--shadow); border: 1px solid var(--line); }
+.chart-card h3 { margin: 0 0 .2rem; font-size: 1.35rem; }
+.chart-card p { margin: 0 0 1rem; color: var(--muted); font-size: .92rem; }
+.chart-card svg { width: 100%; height: auto; display: block; overflow: visible; }
+.axis text { fill: var(--muted); font: 11px Inter, sans-serif; }
+.axis line, .axis path { stroke: var(--line); }
+.charts { display: grid; gap: 16px; grid-template-columns: 1fr; }
+
+/* Emoji */
+.emoji-row { display: flex; flex-wrap: wrap; gap: .8rem; align-items: flex-end; }
+.emoji-row div { text-align: center; }
+.emoji-row .e { line-height: 1; }
+.emoji-row small { display: block; color: var(--muted); font-weight: 600; margin-top: .2rem; }
+
+footer { text-align: center; padding: 4rem 16px 5rem; color: var(--muted); }
+footer .serif { font-size: 2rem; color: var(--ink); font-weight: 900; }
+
+.reveal { opacity: 0; transform: translateY(24px); transition: opacity .7s, transform .7s; }
+.reveal.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  .floater, .scroll-cue { animation: none; }
+  .reveal, .bubble { opacity: 1; transform: none; transition: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="floaters" id="floaters"></div>
+  <div>
+    <h1>bams<em>.</em></h1>
+    <p>One month of <b class="sam">Sam</b> &amp; <b class="ben">Ben</b>, in <b id="h-total"></b> texts<br>
+      and <b id="h-reacts"></b> hearts &amp; haha's.</p>
+  </div>
+  <div class="scroll-cue">scroll ↓</div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Chapter 1</div>
+    <h2>The <span class="sam">Sam</span>-isms</h2>
+    <p class="lede">A field guide to the way Sam texts. Anyone who's been on the receiving end will recognize these instantly.</p>
+
+    <div class="grid">
+      <div class="card wide reveal">
+        <div class="such">ur such a <span class="slot" id="slot">binx</span></div>
+        <div class="sub" id="such-sub"></div>
+      </div>
+      <div class="card pink reveal">
+        <div class="big" id="c-startsbams"></div>
+        <div class="label">texts that open with "bams"</div>
+        <div class="sub">It's not a greeting. It's a whole genre.</div>
+      </div>
+      <div class="card reveal">
+        <div class="big sam" id="c-u"></div>
+        <div class="label">"u", not "you"</div>
+        <div class="sub" id="c-u-sub"></div>
+      </div>
+      <div class="card reveal">
+        <div class="big" id="c-laugh"></div>
+        <div class="label">😂 sent</div>
+        <div class="sub" id="c-laugh-sub"></div>
+      </div>
+      <div class="card reveal">
+        <div class="big sam" id="c-wait"></div>
+        <div class="label">"can't wait"s</div>
+        <div class="sub">Mostly followed by "to see u".</div>
+      </div>
+      <div class="card reveal">
+        <div class="big" id="c-first"></div>
+        <div class="label">mornings she texted first</div>
+        <div class="sub">Early bird. Usually with a 😘.</div>
+      </div>
+      <div class="card wide reveal">
+        <div class="big sam" id="c-len"></div>
+        <div class="label">characters per text, on average</div>
+        <div class="sub" id="c-len-sub"></div>
+      </div>
+      <div class="card reveal">
+        <div class="big">beech</div>
+        <div class="label">a complete sentence</div>
+        <div class="sub">Also: "perf". Also: "beech ur dead to me".</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="kicker">Chapter 2</div>
+    <h2>#hashtag #commentary</h2>
+    <p class="lede">Sam narrates life in hashtags, and they're somehow always right. A few favorites, straight from the thread.</p>
+    <div class="tags" id="tags"></div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Chapter 3</div>
+    <h2>The pet name universe</h2>
+    <p class="lede">Every nickname either of you used this month. Bigger bubble, more uses. The color shows who says it more. (Nobody knows what a binx is. Everyone agrees it's a compliment.)</p>
+    <div class="legend"><span><i style="background:var(--sam)"></i>Mostly Sam</span><span><i style="background:var(--ben)"></i>Mostly Ben</span><span><i style="background:linear-gradient(90deg,var(--sam),var(--ben))"></i>Shared custody</span></div>
+    <div id="pets"></div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="kicker">Chapter 4</div>
+    <h2>What we actually talk about</h2>
+    <p class="lede">Your most-used words, with the boring ones ("the", "and", "going") taken out.</p>
+    <div class="clouds" id="clouds">
+      <div class="chart-card"><h3 class="sam">Sam</h3><div id="cloud-sam"></div></div>
+      <div class="chart-card"><h3 class="ben">Ben</h3><div id="cloud-ben"></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Chapter 5</div>
+    <h2>Head to head</h2>
+    <p class="lede">Who texts more, who loves more, who laughs more. The stats settle it.</p>
+    <div class="fo-head"><div class="sam">Sam</div><div></div><div class="ben">Ben</div></div>
+    <div class="faceoff" id="faceoff"></div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="kicker">Chapter 6</div>
+    <h2>The rhythm of us</h2>
+    <p class="lede">When the texts happen. Sam's up with the sun; Ben shows up after work and stays late.</p>
+    <div class="charts">
+      <div class="chart-card"><h3>Every day this month</h3><p>Texts per day. Not one day went by without a message.</p><div id="daily"></div></div>
+      <div class="chart-card"><h3>Around the clock</h3><p>Texts by hour of day. <span class="sam">Sam</span> above the line, <span class="ben">Ben</span> below it.</p><div id="hours"></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="kicker">Chapter 7</div>
+    <h2>Greatest hits</h2>
+    <p class="lede">Some of Sam's best lines this month.</p>
+    <div class="thread" id="thread"></div>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <div class="kicker">Chapter 8</div>
+    <h2>Emoji &amp; reactions</h2>
+    <p class="lede">Your go-to emoji, and how you react to each other's texts.</p>
+    <div class="grid">
+      <div class="card"><h3 class="sam" style="margin:0 0 1rem">Sam's emoji</h3><div class="emoji-row" id="emoji-sam"></div></div>
+      <div class="card"><h3 class="ben" style="margin:0 0 1rem">Ben's emoji</h3><div class="emoji-row" id="emoji-ben"></div></div>
+      <div class="card wide"><h3 style="margin:0 0 .3rem">Tapbacks</h3><p class="sub" style="margin:0 0 1rem;color:var(--muted)">Long-press reactions on each other's texts.</p><div class="faceoff" id="taps"></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="serif">#soulmates</div>
+  <p id="foot"></p>
+</footer>
+
+<div class="tip" id="tip"></div>
+
+<script>
+const D = window.DATA, P = D.per;
+const fmt = d3.format(",");
+const $ = id => document.getElementById(id);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+// Hero
+$("h-total").textContent = fmt(D.total);
+$("h-reacts").textContent = fmt(D.reactions);
+const floatText = [["s","bams"],["b","omg bams"],["s","ur such a binx"],["b","you're so sweet"],["s","beech!"],["b","monk doodles"],["s","perf"],["s","#soulmates"],["b","love you sm"],["s","i cant wait to see u 😘"],["b","im dead 🤣"],["s","😂😂😂"],["b","sweet cuddles"],["s","morning cheech ❤️"]];
+floatText.forEach(([w, t], i) => {
+  const el = document.createElement("div");
+  el.className = "floater " + w; el.textContent = t;
+  // keep bubbles in the side gutters so they never sit on the headline
+  const left = i % 2 === 0;
+  el.style[left ? "left" : "right"] = (2 + Math.random() * 14) + "%";
+  el.style.top = (8 + ((i * 37) % 80)) + "%";
+  el.style.animationDelay = (i * 1.05) + "s";
+  $("floaters").appendChild(el);
+});
+
+// Sam-isms
+const such = D.urSuchA.map(d => d[0]);
+$("such-sub").textContent = `Sam said "ur such a ___" ${P.sam.urSuchA} times this month. "binx" won, ${D.urSuchA[0][1]} times. Ben managed ${P.ben.urSuchA}.`;
+let si = 0;
+setInterval(() => {
+  const s = $("slot"); s.classList.add("out");
+  setTimeout(() => { si = (si + 1) % such.length; s.textContent = such[si]; s.classList.remove("out"); }, 260);
+}, 1500);
+$("c-startsbams").textContent = P.sam.startsBams;
+$("c-u").textContent = P.sam.u;
+$("c-u-sub").textContent = `vs ${P.sam.you} "you"s. Ben's the other way around: ${P.ben.you} "you"s, only ${P.ben.u} "u"s.`;
+$("c-laugh").textContent = P.sam.cryLaugh;
+$("c-laugh-sub").textContent = `Almost 3× Ben's ${P.ben.cryLaugh}. (Ben is more of a 🤣 guy.)`;
+$("c-wait").textContent = P.sam.cantWait;
+$("c-first").innerHTML = `${P.sam.firstOfDay}<span style="font-size:.4em;color:var(--muted)"> / ${D.days}</span>`;
+$("c-len").textContent = P.sam.avgLen;
+$("c-len-sub").textContent = `Ben averages ${P.ben.avgLen}. Sam writes whole paragraphs, Ben sends vibes. Together it balances out.`;
+
+// Hashtags
+D.hashtags.forEach(t => { const el = document.createElement("span"); el.className = "tag"; el.textContent = t; $("tags").appendChild(el); });
+
+// Tooltip helper
+const tip = $("tip");
+const showTip = (e, html) => { tip.innerHTML = html; tip.style.opacity = 1; tip.style.left = (e.clientX + 12) + "px"; tip.style.top = (e.clientY + 12) + "px"; };
+const hideTip = () => tip.style.opacity = 0;
+
+// Pet name pack
+function drawPets() {
+  const el = $("pets"); el.innerHTML = "";
+  const W = Math.min(el.clientWidth, 1080), H = W < 600 ? W * 1.1 : W * 0.62;
+  const root = d3.hierarchy({ children: D.pets }).sum(d => (d.sam + d.ben));
+  d3.pack().size([W, H]).padding(4)(root);
+  const sam = d3.color(css("--sam")), ben = d3.color(css("--ben"));
+  const mix = d3.interpolateRgb(ben, sam);
+  const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+  const g = svg.selectAll("g").data(root.leaves()).join("g").attr("transform", d => `translate(${d.x},${d.y})`);
+  g.append("circle").attr("r", 0).attr("fill", d => mix(d.data.sam / (d.data.sam + d.data.ben)))
+    .on("mousemove", (e, d) => showTip(e, `<b>${d.data.name}</b><br>Sam ${d.data.sam} · Ben ${d.data.ben}`))
+    .on("mouseleave", hideTip)
+    .transition().delay((d, i) => i * 40).duration(700).ease(d3.easeBackOut).attr("r", d => d.r);
+  g.append("text").text(d => d.data.name).attr("text-anchor", "middle").attr("dy", ".35em")
+    .attr("fill", "#fff").attr("pointer-events", "none")
+    .style("font-family", "Fraunces, serif").style("font-weight", 700)
+    .style("font-size", d => Math.max(0, Math.min(d.r * 2 / Math.max(d.data.name.length, 3) * 1.3, d.r * .7)) + "px")
+    .style("opacity", d => d.r < 12 ? 0 : 1);
+}
+
+// Word clouds
+function drawCloud(who) {
+  const el = $("cloud-" + who); el.innerHTML = "";
+  const W = el.clientWidth || 480, H = W * 0.75;
+  const words = D.clouds[who];
+  const max = words[0][1], min = words[words.length - 1][1];
+  const size = d3.scaleSqrt().domain([min, max]).range([12, W / 7]);
+  const color = css("--" + who), muted = css("--muted"), ink = css("--ink");
+  d3.layout.cloud().size([W, H])
+    .words(words.map(([t, n]) => ({ text: t, n, size: size(n) })))
+    .padding(3).rotate(() => (Math.random() < .15 ? -90 : 0))
+    .font("Fraunces").fontWeight(700).fontSize(d => d.size).random(d3.randomLcg(7))
+    .on("end", ws => {
+      const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+      svg.append("g").attr("transform", `translate(${W / 2},${H / 2})`).selectAll("text").data(ws).join("text")
+        .attr("text-anchor", "middle").attr("transform", d => `translate(${d.x},${d.y}) rotate(${d.rotate})`)
+        .style("font-family", "Fraunces, serif").style("font-weight", 700).style("font-size", d => d.size + "px")
+        .attr("fill", (d, i) => i < 6 ? color : i < 20 ? ink : muted)
+        .text(d => d.text)
+        .on("mousemove", (e, d) => showTip(e, `<b>${d.text}</b> · ${d.n}×`)).on("mouseleave", hideTip);
+    }).start();
+}
+
+// Face-off
+const rows = [
+  ["Texts sent", "", P.sam.messages, P.ben.messages],
+  ['"I love you"s', "", P.sam.loveYou, P.ben.loveYou],
+  ["😘 sent", "", P.sam.kiss, P.ben.kiss],
+  ['"omg"s', "Ben's signature move", P.sam.omg, P.ben.omg],
+  ['Said "bams"', "", P.sam.bams, P.ben.bams],
+  ["Photos & links", "", P.sam.photos, P.ben.photos],
+  ["Mornings texted first", "", P.sam.firstOfDay, P.ben.firstOfDay],
+  ["Minutes to reply", "median, lower = faster", P.sam.replyMin, P.ben.replyMin],
+];
+function faceoff(target, data) {
+  const box = $(target);
+  data.forEach(([label, sub, s, b]) => {
+    const m = Math.max(s, b);
+    box.insertAdjacentHTML("beforeend", `<div class="fo-row reveal">
+      <div class="fo-bar left"><span data-w="${s / m * 100}">${fmt(s)}</span></div>
+      <div class="fo-label">${label}${sub ? `<small>${sub}</small>` : ""}</div>
+      <div class="fo-bar right"><span data-w="${b / m * 100}">${fmt(b)}</span></div></div>`);
+  });
+}
+faceoff("faceoff", rows);
+const tl = t => ["love", "laugh", "emphasize"].map(k => t[k] || 0);
+const [sl, sh, se] = tl(P.sam.taps), [bl, bh, be] = tl(P.ben.taps);
+faceoff("taps", [["❤️ Hearted", "", sl, bl], ["😂 Haha'd", "", sh, bh], ["‼️ Emphasized", "", se, be]]);
+
+// Daily
+function drawDaily() {
+  const el = $("daily"); el.innerHTML = "";
+  const W = el.clientWidth, H = 220, m = { t: 10, r: 4, b: 26, l: 30 };
+  const start = new Date(D.range[0] + "T00:00");
+  const days = d3.range(D.days).map(i => ({ d: d3.timeDay.offset(start, i), s: D.daily.sam[i], b: D.daily.ben[i] }));
+  const x = d3.scaleBand().domain(days.map(d => d.d)).range([m.l, W - m.r]).padding(.18);
+  const y = d3.scaleLinear().domain([0, d3.max(days, d => d.s + d.b)]).nice().range([H - m.b, m.t]);
+  const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+  svg.append("g").attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W - m.l - m.r))).call(g => g.select(".domain").remove()).call(g => g.selectAll("line").attr("stroke-opacity", .6));
+  svg.append("g").attr("class", "axis").attr("transform", `translate(0,${H - m.b})`)
+    .call(d3.axisBottom(x).tickValues(days.filter((d, i) => i % (W < 600 ? 7 : 4) === 0).map(d => d.d)).tickFormat(d3.timeFormat("%b %-d")).tickSize(0).tickPadding(8)).call(g => g.select(".domain").remove());
+  const g = svg.append("g").selectAll("g").data(days).join("g")
+    .on("mousemove", (e, d) => showTip(e, `<b>${d3.timeFormat("%a %b %-d")(d.d)}</b><br><span style="color:${css("--sam")}">Sam ${d.s}</span> · <span style="color:${css("--ben")}">Ben ${d.b}</span>`)).on("mouseleave", hideTip);
+  g.append("rect").attr("x", d => x(d.d)).attr("width", x.bandwidth()).attr("y", d => y(d.b)).attr("height", d => y(0) - y(d.b)).attr("fill", css("--ben")).attr("rx", 2);
+  g.append("rect").attr("x", d => x(d.d)).attr("width", x.bandwidth()).attr("y", d => y(d.s + d.b)).attr("height", d => y(0) - y(d.s)).attr("fill", css("--sam")).attr("rx", 2);
+}
+
+// Hours (mirrored)
+function drawHours() {
+  const el = $("hours"); el.innerHTML = "";
+  const W = el.clientWidth, H = 260, m = { t: 8, r: 4, b: 8, l: 4 }, mid = H / 2;
+  const x = d3.scaleBand().domain(d3.range(24)).range([m.l, W - m.r]).padding(.2);
+  const max = d3.max([...D.hours.sam, ...D.hours.ben]);
+  const y = d3.scaleLinear().domain([0, max]).range([0, mid - 22]);
+  const svg = d3.select(el).append("svg").attr("viewBox", `0 0 ${W} ${H}`);
+  const lab = h => h === 0 ? "12a" : h < 12 ? h + "a" : h === 12 ? "12p" : (h - 12) + "p";
+  const g = svg.selectAll("g").data(d3.range(24)).join("g")
+    .on("mousemove", (e, h) => showTip(e, `<b>${lab(h)}</b><br><span style="color:${css("--sam")}">Sam ${D.hours.sam[h]}</span> · <span style="color:${css("--ben")}">Ben ${D.hours.ben[h]}</span>`)).on("mouseleave", hideTip);
+  g.append("rect").attr("x", h => x(h)).attr("width", x.bandwidth()).attr("y", h => mid - 12 - y(D.hours.sam[h])).attr("height", h => y(D.hours.sam[h])).attr("fill", css("--sam")).attr("rx", 3);
+  g.append("rect").attr("x", h => x(h)).attr("width", x.bandwidth()).attr("y", mid + 12).attr("height", h => y(D.hours.ben[h])).attr("fill", css("--ben")).attr("rx", 3);
+  g.append("text").attr("x", h => x(h) + x.bandwidth() / 2).attr("y", mid + 4).attr("text-anchor", "middle")
+    .attr("fill", css("--muted")).style("font-size", "10px").text(h => (W < 600 ? h % 3 === 0 : true) ? lab(h) : "");
+}
+
+// Quotes thread
+const tbs = ["❤️", "😂", "‼️", "❤️", "😂"];
+D.quotes.forEach((q, i) => {
+  if (i === 0) $("thread").insertAdjacentHTML("beforeend", `<div class="sender">Sam</div>`);
+  const tb = i % 3 === 1 ? ` tb" data-tb="${tbs[i % tbs.length]}` : "";
+  $("thread").insertAdjacentHTML("beforeend", `<div class="bubble${tb}">${q.replace(/</g, "&lt;")}</div>`);
+});
+
+// Emoji
+["sam", "ben"].forEach(w => {
+  const top = D.emoji[w].slice(0, 6), max = top[0][1];
+  top.forEach(([e, n]) => $("emoji-" + w).insertAdjacentHTML("beforeend",
+    `<div><div class="e" style="font-size:${1.2 + 2.6 * Math.sqrt(n / max)}rem">${e}</div><small>${n}</small></div>`));
+});
+
+$("foot").textContent = `Made from ${fmt(D.total)} texts, ${d3.timeFormat("%b %-d")(new Date(D.range[0] + "T00:00"))} – ${d3.timeFormat("%b %-d, %Y")(new Date(D.range[1] + "T00:00"))}. For Sam, from your binx.`;
+
+// Reveal on scroll
+const io = new IntersectionObserver(es => es.forEach(e => {
+  if (!e.isIntersecting) return;
+  e.target.classList.add("in");
+  e.target.querySelectorAll("[data-w]").forEach(s => s.style.width = `max(3rem, ${s.dataset.w}%)`);
+  io.unobserve(e.target);
+}), { threshold: .15 });
+document.querySelectorAll(".reveal, .bubble").forEach(el => io.observe(el));
+
+// Charts that depend on width (and colors, for dark mode)
+function drawAll() { drawPets(); drawCloud("sam"); drawCloud("ben"); drawDaily(); drawHours(); }
+let petsDrawn = false;
+const petIO = new IntersectionObserver(es => { if (es[0].isIntersecting && !petsDrawn) { petsDrawn = true; drawPets(); } }, { threshold: .1 });
+petIO.observe($("pets"));
+document.fonts.ready.then(() => { drawCloud("sam"); drawCloud("ben"); drawDaily(); drawHours(); });
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 200); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawAll);
+</script>
+</body>
+</html>
